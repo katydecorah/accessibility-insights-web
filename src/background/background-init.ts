@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { AppInsights } from 'applicationinsights-js';
 import { Assessments } from 'assessments/assessments';
 import { PostMessageContentHandler } from 'background/post-message-content-handler';
 import { PostMessageContentRepository } from 'background/post-message-content-repository';
@@ -67,6 +66,20 @@ async function initialize(): Promise<void> {
     const indexedDBDataKeysToFetch = [
         IndexedDBDataKeys.assessmentStore,
         IndexedDBDataKeys.userConfiguration,
+        IndexedDBDataKeys.cardSelectionStore,
+        IndexedDBDataKeys.detailsViewStore,
+        IndexedDBDataKeys.devToolStore,
+        IndexedDBDataKeys.commandStore,
+        IndexedDBDataKeys.permissionsStateStore,
+        IndexedDBDataKeys.inspectStore,
+        IndexedDBDataKeys.scopingStore,
+        IndexedDBDataKeys.tabStore,
+        IndexedDBDataKeys.pathSnippetStore,
+        IndexedDBDataKeys.needsReviewScanResultsStore,
+        IndexedDBDataKeys.needsReviewCardSelectionStore,
+        IndexedDBDataKeys.visualizationStore,
+        IndexedDBDataKeys.visualizationScanResultStore,
+        IndexedDBDataKeys.unifiedScanResultStore,
     ];
 
     // These can run concurrently, both because they are read-only and because they use different types of underlying storage
@@ -101,7 +114,7 @@ async function initialize(): Promise<void> {
     );
     debugToolsTelemetryClient.initialize();
 
-    const telemetryClient = getTelemetryClient(applicationTelemetryDataFactory, AppInsights, [
+    const telemetryClient = getTelemetryClient(applicationTelemetryDataFactory, [
         consoleTelemetryClient,
         debugToolsTelemetryClient,
     ]);
@@ -192,6 +205,8 @@ async function initialize(): Promise<void> {
         logger,
         usageLogger,
         windowUtils,
+        persistedData,
+        indexedDBInstance,
     );
 
     const targetPageController = new TargetPageController(

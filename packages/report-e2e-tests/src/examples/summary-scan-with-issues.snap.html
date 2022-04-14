@@ -702,6 +702,11 @@
       .results-container {
         margin-top: 56px;
       }
+      .results-container .title-container :is(h1, h2, h3, h4, h5, h6) {
+        font-weight: unset;
+        margin-block: 0;
+        margin-inline: 0;
+      }
       @media screen and (max-width: 640px) {
         .outcome-past-tense {
           display: none;
@@ -786,6 +791,10 @@
         margin-bottom: unset;
       }</style
     ><style>
+      .heading-element-for-level--OfRDW {
+        margin-block-start: unset;
+        margin-block-end: unset;
+      }
       .failed-instances-container--FqWV6 .collapsible-content {
         margin-left: 24px;
       }
@@ -1640,10 +1649,14 @@
                   id="new-tab-link-with-confirmation-dialog__0"
                   >https://example.com/mock-base-url</a
                 ><script>
-                  (function (linkId, doc, confirmCallback) {
-                    const targetPageLink = doc.getElementById(linkId);
+                  (function addConfirmOnClickHandler(
+                    linkId,
+                    doc,
+                    confirmCallback
+                  ) {
+                    var targetPageLink = doc.getElementById(linkId);
                     targetPageLink.addEventListener("click", function (event) {
-                      const result = confirmCallback(
+                      var result = confirmCallback(
                         "Are you sure you want to navigate away from the Accessibility Insights report?\n" +
                           "This link will open the target page in a new tab.\n\nPress OK to continue or " +
                           "Cancel to stay on the current page."
@@ -1783,7 +1796,7 @@
           ><div class="results-heading--D3Qtr"><h2>Results by URL</h2></div
           ><div class="url-result-section--PmEoY"
             ><div class="collapsible-container collapsed"
-              ><div class="title-container" role="heading" aria-level="3"
+              ><h3 class="heading-element-for-level--OfRDW title-container"
                 ><button
                   class="collapsible-control"
                   aria-expanded="false"
@@ -1827,7 +1840,7 @@
                       ></span
                     ></span
                   ></button
-                ></div
+                ></h3
               ><div
                 id="content-container-failed-urls-section"
                 class="collapsible-content"
@@ -1902,7 +1915,7 @@
             ></div
           ><div class="url-result-section--PmEoY"
             ><div class="collapsible-container collapsed"
-              ><div class="title-container" role="heading" aria-level="3"
+              ><h3 class="heading-element-for-level--OfRDW title-container"
                 ><button
                   class="collapsible-control"
                   aria-expanded="false"
@@ -1953,7 +1966,7 @@
                       ></span
                     ></span
                   ></button
-                ></div
+                ></h3
               ><div
                 id="content-container-not-scanned-urls-section"
                 class="collapsible-content"
@@ -2001,7 +2014,7 @@
             ></div
           ><div class="url-result-section--PmEoY"
             ><div class="collapsible-container collapsed"
-              ><div class="title-container" role="heading" aria-level="3"
+              ><h3 class="heading-element-for-level--OfRDW title-container"
                 ><button
                   class="collapsible-control"
                   aria-expanded="false"
@@ -2047,7 +2060,7 @@
                       ></span
                     ></span
                   ></button
-                ></div
+                ></h3
               ><div
                 id="content-container-passed-urls-section"
                 class="collapsible-content"
@@ -2097,35 +2110,32 @@
             ></div
           ></div
         ><script>
-          (function (doc) {
-            const collapsibles = doc.getElementsByClassName(
-              "collapsible-container"
-            );
-            for (let index = 0; index < collapsibles.length; index++) {
-              const container = collapsibles.item(index);
-              const button =
+          (function addEventListenerForCollapsibleSection(doc) {
+            var _loop = function (index) {
+              var container = collapsibles.item(index);
+              var button =
                 container === null || container === void 0
                   ? void 0
                   : container.querySelector(".collapsible-control");
               if (button == null) {
-                continue;
+                return "continue";
               }
               button.addEventListener("click", function () {
                 var _a;
-                const content =
+                var content =
                   (_a = button.parentElement) === null || _a === void 0
                     ? void 0
                     : _a.nextElementSibling;
                 if (content == null) {
                   throw Error(
-                    `Expected button element's parent to have a next sibling`
+                    "Expected button element's parent to have a next sibling"
                   );
                 }
-                const wasExpandedBefore =
+                var wasExpandedBefore =
                   button.getAttribute("aria-expanded") === "false"
                     ? false
                     : true;
-                const isExpandedAfter = !wasExpandedBefore;
+                var isExpandedAfter = !wasExpandedBefore;
                 button.setAttribute("aria-expanded", isExpandedAfter + "");
                 content.setAttribute("aria-hidden", !isExpandedAfter + "");
                 if (isExpandedAfter) {
@@ -2134,7 +2144,12 @@
                   container.classList.add("collapsed");
                 }
               });
-            }
+            };
+            var collapsibles = doc.getElementsByClassName(
+              "collapsible-container"
+            );
+            for (var index = 0; index < collapsibles.length; index++)
+              _loop(index);
           })(document);
         </script></div
       ></main

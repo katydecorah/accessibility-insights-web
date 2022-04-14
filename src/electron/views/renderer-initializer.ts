@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 import { loadTheme, setFocusVisibility } from '@fluentui/react';
-import { AppInsights } from 'applicationinsights-js';
 import { CardSelectionActionCreator } from 'background/actions/card-selection-action-creator';
 import { CardSelectionActions } from 'background/actions/card-selection-actions';
 import { ContentActions } from 'background/actions/content-actions';
@@ -212,9 +211,14 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
         );
         userConfigurationStore.initialize();
 
+        const telemetryDataFactory = new TelemetryDataFactory();
+
         const interpreter = new Interpreter();
         const dispatcher = new DirectActionMessageDispatcher(interpreter);
-        const userConfigMessageCreator = new UserConfigMessageCreator(dispatcher);
+        const userConfigMessageCreator = new UserConfigMessageCreator(
+            dispatcher,
+            telemetryDataFactory,
+        );
 
         const apkLocator: AndroidServiceApkLocator = new AndroidServiceApkLocator(
             ipcRendererShim.getAppPath,
@@ -249,6 +253,9 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
         const unifiedScanResultStore = new UnifiedScanResultStore(
             unifiedScanResultActions,
             tabActions,
+            persistedData.unifiedScanResultStoreData,
+            indexedDBInstance,
+            logger,
         );
         unifiedScanResultStore.initialize();
 
@@ -261,6 +268,9 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
         const cardSelectionStore = new CardSelectionStore(
             cardSelectionActions,
             unifiedScanResultActions,
+            persistedData.cardSelectionStoreData,
+            indexedDBInstance,
+            logger,
         );
         cardSelectionStore.initialize();
 
@@ -268,6 +278,9 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
             contentActions,
             detailsViewActions,
             sidePanelActions,
+            persistedData.detailsViewStoreData,
+            indexedDBInstance,
+            logger,
         );
         detailsViewStore.initialize();
 
@@ -304,11 +317,6 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
 
         const featureFlagsController = new FeatureFlagsController(featureFlagStore, interpreter);
 
-        const userConfigurationActionCreator = new UserConfigurationActionCreator(
-            userConfigActions,
-        );
-
-        const telemetryDataFactory = new TelemetryDataFactory();
         const telemetryLogger = new TelemetryLogger(logger);
         telemetryLogger.initialize(featureFlagsController);
 
@@ -317,10 +325,15 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
             telemetryLogger,
         );
 
-        const telemetryClient = getTelemetryClient(applicationTelemetryDataFactory, AppInsights, [
+        const telemetryClient = getTelemetryClient(applicationTelemetryDataFactory, [
             consoleTelemetryClient,
         ]);
         const telemetryEventHandler = new TelemetryEventHandler(telemetryClient);
+
+        const userConfigurationActionCreator = new UserConfigurationActionCreator(
+            userConfigActions,
+            telemetryEventHandler,
+        );
 
         registerUserConfigurationMessageCallback(interpreter, userConfigurationActionCreator);
 
