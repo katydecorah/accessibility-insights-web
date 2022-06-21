@@ -9,6 +9,11 @@ module.exports = {
         'declaration-block-no-redundant-longhand-properties': null, // Prefer longhand to improve readability
         'shorthand-property-no-redundant-values': null, // Prefer longhand to improve readability
         'scss/comment-no-empty': null, // Disabled to allow for paragraph breaks in longer comments which is not supported yet: https://github.com/stylelint-scss/stylelint-scss/issues/606
+        'declaration-property-value-allowed-list': {
+            // Value of `font-weight` must be a $font-weight-variable or unset
+            // Visit src/common/styles/fonts.scss for font-weight variables
+            'font-weight': ['/^\\$font-weight-.*$/', 'unset'],
+        },
 
         // TO BE ENABLED: Recommended fixes
         'no-descending-specificity': null,
@@ -16,9 +21,6 @@ module.exports = {
         // TO BE CONFIGURED: Limit shorthand for margin, padding
         // Stretch goal: border-width, border-radius, border-color, border-style, grid-gap
         // Example: 'declaration-property-max-values': { padding: 1 },
-
-        // TO BE CONFIGURED: Enforce variable values
-        // Example: 'declaration-property-value-allowed-list': { 'font-weight': ['/^\\$.*$/']},
 
         // TO BE CONFIGURED: Variable, selector, mixin case
         // https://stylelint.io/user-guide/rules/regex
