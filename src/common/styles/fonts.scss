@@ -36,15 +36,21 @@ $fonts: (
     'Segoe UI Emoji',
     'Segoe UI Symbol'
 );
+
+// Families
 $common-font-family: make-font-family($fonts) !default;
 $font-family: $common-font-family !default;
 $font-stack: $common-font-family !default;
 $toolbar-font-family: $common-font-family !default;
+
+// Weights
 $font-weight-light: 100 !default;
 $font-weight-normal-title: 300 !default;
-$font-weight-normal: 400 !default; // normal
+$font-weight-normal: 400 !default;
 $font-weight-semi-bold: 600 !default;
-$font-weight-bold: 700 !default; // bold
+$font-weight-bold: 700 !default;
+
+// Sizes
 $grid-font-size: 12px !default;
 $toolbar-font-size: 12px !default;
 $toolbar-font-semi-light: 500 $toolbar-font-size $toolbar-font-family !default;
