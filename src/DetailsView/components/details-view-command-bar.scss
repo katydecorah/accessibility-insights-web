@@ -18,7 +18,7 @@
     align-items: center;
     background-color: $neutral-0;
     font-size: 14px;
-    font-weight: normal;
+    font-weight: $font-weight-normal;
     border-bottom: $details-view-command-bar-border-height solid $neutral-alpha-8;
 
     .details-view-target-page {

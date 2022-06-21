@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 @import '../../../common/styles/colors.scss';
+@import '../../../common/styles/fonts.scss';
 
 .report-congrats-message {
     word-break: break-word;
@@ -9,7 +10,7 @@
 
 .report-congrats-head {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: $font-weight-semi-bold;
     color: $primary-text;
     padding: 10px 0 10px 0;
 }

@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 @import '../../../common/styles/colors.scss';
+@import '../../../common/styles/fonts.scss';
 
 .urls-row-content {
     padding-left: 16px;
@@ -14,5 +15,5 @@
 
 .urls-row-content-new-Failure {
     color: $negative-outcome;
-    font-weight: bold;
+    font-weight: $font-weight-bold;
 }

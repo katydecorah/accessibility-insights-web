@@ -27,7 +27,7 @@ $outcome-not-applicable-color: $neutral-outcome;
     margin-bottom: 0;
     line-height: 24px;
     font-size: 17px;
-    font-weight: 600;
+    font-weight: $font-weight-semi-bold;
     white-space: pre-wrap;
 
     .block,
@@ -44,7 +44,7 @@ $outcome-not-applicable-color: $neutral-outcome;
     }
 
     .count {
-        font-weight: 600;
+        font-weight: $font-weight-semi-bold;
     }
 
     .fail {
@@ -117,6 +117,6 @@ $outcome-not-applicable-color: $neutral-outcome;
     }
 
     .label {
-        font-weight: normal;
+        font-weight: $font-weight-normal;
     }
 }

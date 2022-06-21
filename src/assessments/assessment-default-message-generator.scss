@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+@import '../common/styles/fonts.scss';
+
 .no-failure-view {
     font-size: 15px;
-    font-weight: normal;
+    font-weight: $font-weight-normal;
     padding: 15px 0 15px 15px;
 }

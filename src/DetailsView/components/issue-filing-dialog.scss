@@ -8,12 +8,12 @@
             font-size: 21px;
             line-height: 32px;
             letter-spacing: -0.02em;
-            font-weight: 600;
+            font-weight: $font-weight-semi-bold;
             padding-bottom: 0;
         }
 
         .ms-Dialog-subText {
-            font-weight: 400;
+            font-weight: $font-weight-normal;
             font-size: 15px;
             color: $secondary-text;
         }

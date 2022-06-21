@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 @import '../../common/styles/colors.scss';
+@import '../../common/styles/fonts.scss';
 
 .diagnostic-view-toggle {
     display: grid;
@@ -9,7 +10,7 @@
     align-items: center;
 
     .title {
-        font-weight: 600;
+        font-weight: $font-weight-semi-bold;
         font-size: 15px;
     }
 
@@ -27,7 +28,7 @@
         grid-row: 2;
         grid-column: 2;
         justify-self: end;
-        font-weight: 400;
+        font-weight: $font-weight-normal;
         font-size: 11px;
         color: $secondary-text;
     }

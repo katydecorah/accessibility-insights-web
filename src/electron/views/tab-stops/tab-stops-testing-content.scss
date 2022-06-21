@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+@import '../../../common/styles/fonts.scss';
 
 .how-to-test-list {
     padding-left: 1em;
@@ -16,6 +17,6 @@
     :global(.ms-Label) {
         margin-right: 8px;
         font-size: 17px;
-        font-weight: 600;
+        font-weight: $font-weight-semi-bold;
     }
 }

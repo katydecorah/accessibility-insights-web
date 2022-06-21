@@ -40,10 +40,11 @@ $common-font-family: make-font-family($fonts) !default;
 $font-family: $common-font-family !default;
 $font-stack: $common-font-family !default;
 $toolbar-font-family: $common-font-family !default;
-$font-weight-heavy: bold !default;
-$font-weight-normal: normal !default;
-$font-weight-lighter: 200 !default;
+$font-weight-light: 100 !default;
+$font-weight-normal-title: 300 !default;
+$font-weight-normal: 400 !default; // normal
 $font-weight-semi-bold: 600 !default;
+$font-weight-bold: 700 !default; // bold
 $grid-font-size: 12px !default;
 $toolbar-font-size: 12px !default;
 $toolbar-font-semi-light: 500 $toolbar-font-size $toolbar-font-family !default;
@@ -70,7 +71,7 @@ $code-font-family: menlo, consolas, courier new, monospace !default;
 
 @mixin text-style-title-l {
     font-size: 28px;
-    font-weight: 700;
+    font-weight: $font-weight-bold;
     letter-spacing: -0.04em;
     line-height: 40px;
 }

@@ -1,11 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 @import '../styles/colors.scss';
+@import '../styles/fonts.scss';
 
 .guidance-tags {
     span {
         font-size: 12px;
-        font-weight: normal;
+        font-weight: $font-weight-normal;
         margin-left: 8px;
         padding: 2px 12px;
         color: $pill;
