@@ -118,8 +118,8 @@
         "@types/ua-parser-js": "^0.7.36",
         "@types/uuid": "^8.3.4",
         "@types/webextension-polyfill": "^0.9.0",
-        "@typescript-eslint/eslint-plugin": "^5.28.0",
-        "@typescript-eslint/parser": "^5.28.0",
+        "@typescript-eslint/eslint-plugin": "^5.29.0",
+        "@typescript-eslint/parser": "^5.29.0",
         "app-builder-lib": "^23.1.0",
         "case-sensitive-paths-webpack-plugin": "^2.4.0",
         "codecov": "^3.8.3",
@@ -184,7 +184,7 @@
         "webpack-node-externals": "^3.0.0"
     },
     "dependencies": {
-        "@fluentui/react": "^8.68.3",
+        "@fluentui/react": "^8.77.1",
         "@microsoft/applicationinsights-web": "^2.8.4",
         "accessibility-insights-for-android-service-bin": "2.0.0",
         "ajv": "^8.11.0",
