@@ -9,14 +9,16 @@
 }
 
 .tab-stops-test-view {
-    padding-top: $fastPassRightPanelMarginTop;
-    padding-right: $fastPassRightPanelMarginRight;
-    padding-left: $fastPassRightPanelMarginLeft;
+    padding-top: $fast-pass-right-panel-margin-top;
+    padding-right: $fast-pass-right-panel-margin-right;
+    padding-left: $fast-pass-right-panel-margin-left;
     margin-bottom: auto;
     background-color: $neutral-2;
+
     i {
         font-size: 16px;
     }
+
     .tab-stops-test-view-header {
         margin-right: 8px;
     }
@@ -24,6 +26,7 @@
 
 .requirement-table-title {
     @include text-style-title-s;
+
     margin-bottom: unset;
 }
 
@@ -35,6 +38,7 @@
 
     label {
         @include text-style-body-m;
+
         margin-right: 8px;
         font-weight: 600;
     }
@@ -42,6 +46,7 @@
 
 .requirement-how-to-test-header {
     @include text-style-title-s;
+
     padding-left: 0.5vw;
     display: block;
 }

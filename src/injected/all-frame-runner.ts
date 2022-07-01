@@ -11,8 +11,8 @@ import {
 
 export interface AllFrameRunnerTarget<T> {
     commandSuffix: string;
-    start: () => void;
-    stop: () => void;
+    start: () => Promise<void>;
+    stop: () => Promise<void>;
     transformChildResultForParent: (fromChild: T, messageSourceFrame: HTMLIFrameElement) => T;
     setResultCallback: (reportResults: (payload: T) => Promise<void>) => void;
 }
@@ -29,7 +29,7 @@ before calling runner.start() / runner.stop()
 - runner.start() will run target.start() in the current frame, and then in any child frames
 - runner.stop() will run target.stop() in the current frame, and then in any child frames
 - runner provides target with a reportResults callback. When target.reportResults(payload) is 
-called, runner propogates payload to parent frames. In each parent frame, runner replaces the 
+called, runner propagates payload to parent frames. In each parent frame, runner replaces the 
 payload with target.transformChildResultForParent(payload). When the result reaches the top window, 
 runner calls topWindowCallback(payload)
 */
@@ -66,13 +66,15 @@ export class AllFrameRunner<T> {
     }
 
     public start = async () => {
-        this.listener.start();
+        const startPromise = this.listener.start();
         await this.sendCommandToFrames(this.startCommand);
+        await startPromise;
     };
 
     public stop = async () => {
-        this.listener.stop();
+        const stopPromise = this.listener.stop();
         await this.sendCommandToFrames(this.stopCommand);
+        await stopPromise;
     };
 
     private reportResultsThroughFrames = async (

@@ -15,6 +15,8 @@ module.exports = {
         '!<rootDir>/**/jest.config.js',
         '!<rootDir>/**/prettier.config.js',
         '!<rootDir>/**/webpack.config.js',
+        '!<rootDir>/**/esbuild.js',
+        '!<rootDir>/**/style-config.js',
         '!<rootDir>/**/node_modules/**',
         '!<rootDir>/**/test-results/**',
     ],
@@ -32,6 +34,7 @@ module.exports = {
     },
     reporters: [
         'default',
+        'github-actions',
         [
             'jest-junit',
             {
@@ -40,6 +43,7 @@ module.exports = {
             },
         ],
     ],
+    resolver: `${__dirname}/src/tests/common/resolver.js`,
     setupFilesAfterEnv: [`${__dirname}/src/tests/common/flush-promises-after-each-test.ts`],
     snapshotSerializers: [`${__dirname}/src/tests/common/typemoq-snapshot-serializer.ts`],
     testEnvironment: 'node',

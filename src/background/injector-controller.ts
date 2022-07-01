@@ -3,7 +3,6 @@
 import { InspectMode } from 'background/inspect-modes';
 import { Logger } from 'common/logging/logger';
 import { Messages } from '../common/messages';
-import { WindowUtils } from '../common/window-utils';
 import { ContentScriptInjector } from './injector/content-script-injector';
 import { Interpreter } from './interpreter';
 import { InspectStore } from './stores/inspect-store';
@@ -21,7 +20,7 @@ export class InjectorController {
         private readonly interpreter: Interpreter,
         private readonly tabStore: TabStore,
         private readonly inspectStore: InspectStore,
-        private readonly windowUtils: WindowUtils,
+        private readonly setTimeout: (handler: Function, timeout: number) => number,
         private readonly logger: Logger,
     ) {}
 
@@ -43,7 +42,7 @@ export class InjectorController {
             inspectStoreInjectingRequested || visualizationStoreState.injectingRequested;
 
         if (isInjectingRequested && !visualizationStoreState.injectingStarted) {
-            this.windowUtils.setTimeout(() => {
+            this.setTimeout(() => {
                 this.interpreter.interpret({
                     messageType: Messages.Visualizations.State.InjectionStarted,
                     tabId: tabId,
@@ -52,11 +51,13 @@ export class InjectorController {
 
             this.injector
                 .injectScripts(tabId)
-                .then(() => {
-                    this.interpreter.interpret({
+                .then(async () => {
+                    const response = this.interpreter.interpret({
                         messageType: Messages.Visualizations.State.InjectionCompleted,
                         tabId: tabId,
                     });
+
+                    await response.result;
                 })
                 .catch(this.logger.error);
         }

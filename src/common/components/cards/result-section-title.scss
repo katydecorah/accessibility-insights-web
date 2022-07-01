@@ -25,12 +25,13 @@
 
     .title {
         @include text-style-title-s;
+
         margin-right: 6px;
         color: $primary-text;
     }
 
     .heading {
-        font-weight: $fontWeightSemiBold;
+        font-weight: $font-weight-semi-bold;
         font-size: 15px;
         line-height: 20px;
         margin-right: 6px;

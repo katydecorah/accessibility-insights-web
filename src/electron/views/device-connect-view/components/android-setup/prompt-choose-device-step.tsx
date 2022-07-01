@@ -15,7 +15,7 @@ import * as React from 'react';
 import { AndroidSetupStepLayout, AndroidSetupStepLayoutProps } from './android-setup-step-layout';
 import { CommonAndroidSetupStepProps } from './android-setup-types';
 import { DeviceDescription } from './device-description';
-import * as styles from './prompt-choose-device-step.scss';
+import styles from './prompt-choose-device-step.scss';
 
 export type PromptChooseDeviceListItem = {
     deviceInfo: DeviceInfo;
@@ -64,7 +64,7 @@ export class PromptChooseDeviceStep extends React.Component<
                     <DetailsList
                         setKey={'devices'}
                         compact={true}
-                        ariaLabel="android devices"
+                        ariaLabelForGrid="android devices"
                         className={styles.phoneList}
                         items={listItems}
                         selection={this.selection}

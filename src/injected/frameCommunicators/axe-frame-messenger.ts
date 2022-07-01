@@ -10,39 +10,15 @@ import {
     CallbackWindowCommandMessageListener,
 } from './respondable-command-message-communicator';
 
-// These are the corrected typings from https://github.com/dequelabs/axe-core/pull/2885, which
-// didn't quite make the axe-core 4.2.1 release. They can be replaced with axe.* typings once
-// https://github.com/dequelabs/axe-core/pull/2885 merges and releases.
-namespace axe2885 {
-    export type FrameMessenger = {
-        open: (topicHandler: TopicHandler) => Close | void;
-        post: (frameWindow: Window, data: TopicData, replyHandler: ReplyHandler) => boolean | void;
-    };
-    export type Close = Function;
-    export type TopicHandler = (data: TopicData, responder: Responder) => void;
-    export type ReplyHandler = (
-        message: any | Error,
-        keepalive: boolean,
-        responder: Responder,
-    ) => void;
-    export type Responder = (
-        message: any | Error,
-        keepalive?: boolean,
-        replyHandler?: ReplyHandler,
-    ) => void;
-    export type TopicData = { topic: String } & ReplyData;
-    export type ReplyData = { channelId: String; message: any; keepalive: boolean };
-}
-
 const postCommand = 'axe.frameMessenger.post';
-type PostCommandRequestPayload = axe2885.TopicData;
+type PostCommandRequestPayload = axe.TopicData;
 type PostCommandResponsePayload =
     | { type: 'success'; message: any; keepalive: boolean }
     | { type: 'error' };
 
 // AxeFrameMessenger is an axe-core axe.frameMessenger-compatible version of our FrameMessenger
-export class AxeFrameMessenger implements axe2885.FrameMessenger {
-    private topicHandlers: axe2885.TopicHandler[] = [];
+export class AxeFrameMessenger implements axe.FrameMessenger {
+    private topicHandlers: axe.TopicHandler[] = [];
 
     constructor(
         private readonly underlyingCommunicator: RespondableCommandMessageCommunicator,
@@ -55,7 +31,7 @@ export class AxeFrameMessenger implements axe2885.FrameMessenger {
         axeInstance.frameMessenger(this as any);
     }
 
-    public open = (topicHandler: axe2885.TopicHandler): axe2885.Close => {
+    public open = (topicHandler: axe.TopicHandler): axe.Close => {
         if (this.topicHandlers.length === 0) {
             this.underlyingCommunicator.addCallbackCommandMessageListener(
                 postCommand,
@@ -66,7 +42,7 @@ export class AxeFrameMessenger implements axe2885.FrameMessenger {
         return () => this.close(topicHandler);
     };
 
-    public close = (topicHandler: axe2885.TopicHandler) => {
+    public close = (topicHandler: axe.TopicHandler) => {
         this.topicHandlers = this.topicHandlers.filter(h => h !== topicHandler);
         if (this.topicHandlers.length === 0) {
             this.underlyingCommunicator.removeCommandMessageListener(postCommand);
@@ -75,21 +51,22 @@ export class AxeFrameMessenger implements axe2885.FrameMessenger {
 
     public post = (
         frameWindow: Window,
-        topicData: axe2885.TopicData,
-        replyHandler: axe2885.ReplyHandler,
+        topicData: axe.TopicData,
+        replyHandler: axe.ReplyHandler,
     ): boolean => {
         const payload: PostCommandRequestPayload = topicData;
         const message: CommandMessage = { command: postCommand, payload };
 
-        const replyToReplyCallback: axe2885.Responder = () => {
+        const replyToReplyCallback: axe.Responder = () => {
             // As of 4.2.1, axe-core is documented as not using replies to replies, and we don't
             // use any axe-core plugins that might require this.
             this.logger.error(
                 'AxeFrameMessenger does not support replies-to-replies, but a post replyHandler invoked a responder.',
+                new Error(),
             );
         };
 
-        const responseCallback = (response: CommandMessageResponse): void => {
+        const responseCallback = async (response: CommandMessageResponse): Promise<void> => {
             const payload: PostCommandResponsePayload = response.payload;
             // This behavior of passing an Error object if the respondee throws an error is missing
             // from the axe-core frame-messenger documentation, but it matches the default axe-core
@@ -109,27 +86,32 @@ export class AxeFrameMessenger implements axe2885.FrameMessenger {
                 // frame's console.
                 this.logger.error(
                     'An axe-core error occurred while processing a result from a child frame.',
+                    new Error(),
                 );
             }
         };
 
-        try {
-            this.underlyingCommunicator.sendCallbackCommandMessage(
+        // Float this promise to keep function synchronous and match axe's interface.
+        // This means that we can't catch errors and return false to short-circuit axe's
+        // polling mechanism if this message fails, but axe should still time out and
+        // handle the failure.
+        void this.underlyingCommunicator
+            .sendCallbackCommandMessage(
                 frameWindow,
                 message,
                 responseCallback,
                 // Usage for keepAlive is missing from the axe-core frame-messenger documentation,
                 // but this behavior matches the default axe-core frame messenger.
                 topicData.keepalive ? 'multiple' : 'single',
+            )
+            .catch(e =>
+                this.logger.error(
+                    `Error while attempting to send axe-core frameMessenger message: ${e.message}`,
+                    e,
+                ),
             );
-            return true;
-        } catch (e) {
-            this.logger.error(
-                `Error while attempting to send axe-core frameMessenger message: ${e.message}`,
-                e,
-            );
-            return false;
-        }
+
+        return true;
     };
 
     public onMessage: CallbackWindowCommandMessageListener = (
@@ -138,22 +120,26 @@ export class AxeFrameMessenger implements axe2885.FrameMessenger {
         commandMessageResponder: (response: CommandMessageResponse) => void,
     ): void => {
         if (sourceWindow !== this.windowUtils.getParentWindow()) {
-            this.logger.error('Received unexpected axe-core message from a non-parent window');
+            this.logger.error(
+                'Received unexpected axe-core message from a non-parent window',
+                new Error(),
+            );
             return;
         }
 
         const receivedPayload: PostCommandRequestPayload = receivedMessage.payload;
-        const topicData: axe2885.TopicData = receivedPayload;
-        const topicResponder: axe2885.Responder = (
+        const topicData: axe.TopicData = receivedPayload;
+        const topicResponder: axe.Responder = (
             message: any,
             keepalive?: boolean,
-            replyHandler?: axe2885.ReplyHandler,
+            replyHandler?: axe.ReplyHandler,
         ): void => {
             if (replyHandler != null) {
                 // As of 4.2.1, axe-core is documented as not using replies to replies, and we don't
                 // use any axe-core plugins that might require this.
                 this.logger.error(
                     'AxeFrameMessenger does not support replies-to-replies, but a topicHandler provided a replyHandler in a response callback.',
+                    new Error(),
                 );
             }
             const responsePayload: PostCommandResponsePayload = {

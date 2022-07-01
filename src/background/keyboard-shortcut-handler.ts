@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import { Tabs } from 'webextension-polyfill-ts';
+import { TabContextManager } from 'background/tab-context-manager';
+import { Tabs } from 'webextension-polyfill';
 import { BrowserAdapter } from '../common/browser-adapters/browser-adapter';
 import { CommandsAdapter } from '../common/browser-adapters/commands-adapter';
 import { VisualizationConfigurationFactory } from '../common/configs/visualization-configuration-factory';
@@ -19,7 +20,6 @@ import { UrlValidator } from '../common/url-validator';
 import { DictionaryStringTo } from '../types/common-types';
 import { VisualizationTogglePayload } from './actions/action-payloads';
 import { UserConfigurationStore } from './stores/global/user-configuration-store';
-import { TabToContextMap } from './tab-context';
 import { UsageLogger } from './usage-logger';
 
 const VisualizationMessages = Messages.Visualizations;
@@ -29,7 +29,7 @@ export class KeyboardShortcutHandler {
     private commandToVisualizationType: DictionaryStringTo<VisualizationType>;
 
     constructor(
-        private tabToContextMap: TabToContextMap,
+        private tabContextManager: TabContextManager,
         private browserAdapter: BrowserAdapter,
         private urlValidator: UrlValidator,
         private notificationCreator: NotificationCreator,
@@ -62,10 +62,10 @@ export class KeyboardShortcutHandler {
             }
 
             const tabId = currentTab.id;
-            const tabContext = this.tabToContextMap[tabId];
+            const tabStores = this.tabContextManager.getTabContextStores(tabId);
             this.targetTabUrl = currentTab.url;
 
-            if (!tabContext) {
+            if (!tabStores) {
                 return;
             }
 
@@ -84,7 +84,7 @@ export class KeyboardShortcutHandler {
                 return;
             }
 
-            const state = tabContext.stores.visualizationStore.getState();
+            const state = tabStores.visualizationStore.getState();
 
             if (state.scanning != null) {
                 // do not notify if we are already scanning
@@ -95,7 +95,7 @@ export class KeyboardShortcutHandler {
 
             if (visualizationType != null) {
                 this.createEnableNotificationIfCurrentStateIsDisabled(visualizationType, state);
-                this.invokeToggleAction(visualizationType, state, tabId);
+                await this.invokeToggleAction(visualizationType, state, tabId);
             }
         } catch (err) {
             this.logger.error('Error occurred at chrome command handler:', err);
@@ -147,15 +147,14 @@ export class KeyboardShortcutHandler {
         return visualizationType !== VisualizationType.TabStops;
     }
 
-    private invokeToggleAction(
+    private async invokeToggleAction(
         visualizationType: VisualizationType,
         state: VisualizationStoreData,
         tabId: number,
-    ): void {
+    ): Promise<void> {
         const configuration =
             this.visualizationConfigurationFactory.getConfiguration(visualizationType);
         const scanData: ScanData = configuration.getStoreData(state.tests);
-        const tabContext = this.tabToContextMap[tabId];
 
         const action = VisualizationMessages.Common.Toggle;
         const toEnabled = !scanData.enabled;
@@ -169,10 +168,11 @@ export class KeyboardShortcutHandler {
             test: visualizationType,
         };
 
-        tabContext.interpreter.interpret({
+        const response = this.tabContextManager.interpretMessageForTab(tabId, {
             tabId: tabId,
             messageType: action,
             payload,
         });
+        await response.result;
     }
 }

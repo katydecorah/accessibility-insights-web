@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 @import '../../common/styles/root-level-only/color-definitions.scss';
 @import '../../common/styles/colors.scss';
+@import '../../common/styles/common.scss';
 
 #accessibility-insights-root-container {
     visibility: hidden !important;
@@ -15,6 +16,7 @@
     line-height: 1.5 !important;
     letter-spacing: 0.12em !important;
     word-spacing: 0.16em !important;
+
     p {
         margin-bottom: 2em !important;
     }
@@ -29,10 +31,6 @@
 
 #accessibility-insights-root-container,
 #insights-shadow-container {
-    @import '../../common/styles/colors.scss';
-    @import '../../common/styles/common.scss';
-    @import '../../common/components/toast.scss';
-
     @mixin max-z-index-1 {
         z-index: 2147483646 !important;
     }
@@ -41,23 +39,24 @@
         z-index: 2147483647 !important;
     }
 
-    @include max-z-index();
+    @include max-z-index;
 
     position: absolute !important;
-    top: 0px !important;
-    left: 0px !important;
-    padding: 0px !important;
-    margin: 0px !important;
+    top: 0 !important;
+    left: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
     width: 100% !important;
     height: 100% !important;
 
     .insights-dialog-container {
-        @include max-z-index();
+        @include max-z-index;
+
         position: absolute !important;
-        top: 0px !important;
-        left: 0px !important;
-        padding: 0px !important;
-        margin: 0px !important;
+        top: 0 !important;
+        left: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
     div.insights-dialog-main-container {
@@ -65,6 +64,7 @@
         max-width: 25%;
         user-select: text;
         min-width: 520px;
+
         svg path {
             @media screen and (forced-colors: active) {
                 forced-color-adjust: none !important;
@@ -149,7 +149,7 @@
         margin-bottom: 8px !important;
         font-size: 12px !important;
         color: $negative-outcome !important;
-        font-weight: $fontWeightSemiBold !important;
+        font-weight: $font-weight-semi-bold !important;
     }
 
     .insights-dialog-main-override .file-issue-button-help {
@@ -157,23 +157,23 @@
         margin-bottom: 8px !important;
         font-size: 12px !important;
         color: $negative-outcome;
-        font-weight: $fontWeightSemiBold;
+        font-weight: $font-weight-semi-bold;
     }
 
     .insights-dialog-main-override .copy-issue-details-button-help {
         margin-top: 4px !important;
         font-size: 12px !important;
         color: $negative-outcome !important;
-        font-weight: $fontWeightSemiBold !important;
+        font-weight: $font-weight-semi-bold !important;
     }
 
     .insights-dialog-main-override {
         .insights-dialog-title {
             margin-bottom: 16px !important;
-            padding-bottom: 0px !important;
+            padding-bottom: 0 !important;
             color: $primary-text !important;
             font-size: 21px !important;
-            font-weight: $fontWeightSemiBold !important;
+            font-weight: $font-weight-semi-bold !important;
             letter-spacing: -0.02em !important;
         }
 
@@ -182,7 +182,7 @@
             margin-bottom: 4px !important;
             color: $primary-text !important;
             font-size: 15px !important;
-            font-weight: $fontWeightSemiBold !important;
+            font-weight: $font-weight-semi-bold !important;
         }
 
         .insights-dialog-content {
@@ -190,7 +190,7 @@
             font-size: 14px !important;
 
             ul {
-                margin: 8px 8px 0px 8px !important;
+                margin: 8px 8px 0 8px !important;
                 padding-left: 8px !important;
             }
         }
@@ -207,7 +207,7 @@
                 margin-left: 4px !important;
                 margin-right: 4px !important;
                 line-height: 100% !important;
-                font-weight: $fontWeightSemiBold !important;
+                font-weight: $font-weight-semi-bold !important;
             }
 
             svg {
@@ -220,16 +220,18 @@
             margin-top: 16px !important;
             display: grid !important;
             color: $primary-text !important;
-            font-size: $fontSizeM !important;
+            font-size: $font-size-m !important;
             align-items: center !important;
-
             grid-template-columns: 100px 1fr 100px !important;
+
             :nth-child(1) {
                 text-align: left !important;
             }
+
             :nth-child(2) {
                 text-align: center !important;
             }
+
             :nth-child(3) {
                 text-align: right !important;
             }
@@ -239,7 +241,8 @@
     .insights-highlight-container,
     .insights-highlight-container svg {
         position: absolute !important;
-        @include max-z-index-1();
+        @include max-z-index-1;
+
         top: 0 !important;
         left: 0 !important;
         overflow: visible !important;
@@ -252,6 +255,11 @@
         position: absolute !important;
         overflow: hidden !important;
         pointer-events: none !important;
+
+        @include ms-high-contrast-override {
+            forced-color-adjust: none;
+            outline-color: Highlight !important;
+        }
     }
 
     .insights-highlight-container .insights-highlight-box .insights-highlight-text {
@@ -264,13 +272,6 @@
         text-align: center !important;
     }
 
-    .insights-highlight-container .insights-highlight-box {
-        @include ms-high-contrast-override {
-            forced-color-adjust: none;
-            outline-color: Highlight !important;
-        }
-    }
-
     .insights-highlight-container .insights-highlight-text {
         @include ms-high-contrast-override {
             forced-color-adjust: none;
@@ -280,7 +281,8 @@
     }
 
     :host {
-        @include max-z-index-1();
+        @include max-z-index-1;
+
         top: 0 !important;
         left: 0 !important;
         width: 0 !important;

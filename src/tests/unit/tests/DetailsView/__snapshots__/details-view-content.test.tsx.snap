@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[` render renders normally 1`] = `
+exports[`DetailsViewContent render renders normally 1`] = `
 <React.Fragment>
   <InteractiveHeader
     deps={
@@ -13,7 +13,6 @@ exports[` render renders normally 1`] = `
         "getDetailsRightPanelConfiguration": [Function],
         "getDetailsSwitcherNavConfiguration": [Function],
         "isResultHighlightUnavailable": [Function],
-        "storeActionMessageCreator": undefined,
         "storesHub": [typemoq mock object],
       }
     }
@@ -57,7 +56,6 @@ exports[` render renders normally 1`] = `
         "getDetailsRightPanelConfiguration": [Function],
         "getDetailsSwitcherNavConfiguration": [Function],
         "isResultHighlightUnavailable": [Function],
-        "storeActionMessageCreator": undefined,
         "storesHub": [typemoq mock object],
       }
     }
@@ -392,7 +390,6 @@ exports[` render renders normally 1`] = `
         "getDetailsRightPanelConfiguration": [Function],
         "getDetailsSwitcherNavConfiguration": [Function],
         "isResultHighlightUnavailable": [Function],
-        "storeActionMessageCreator": undefined,
         "storesHub": [typemoq mock object],
       }
     }

@@ -4,26 +4,30 @@
 
 .requirement-instructions-header {
     font-style: normal;
-    font-weight: $fontWeightSemiBold;
-    font-size: $fontSizeML;
+    font-weight: $font-weight-semi-bold;
+    font-size: $font-size-ml;
     line-height: 20px;
     padding-left: 0.5vw;
     display: block;
 }
 
 .requirement-instructions {
-    font-family: $fontFamily;
+    font-family: $font-family;
+
     p,
     ol,
     li {
-        margin: 5px 0px;
+        margin: 5px 0;
     }
+
     ol {
         -webkit-padding-start: 16px;
     }
+
     ol ol {
         list-style-type: lower-alpha;
     }
+
     ol ol ol {
         list-style-type: lower-roman;
     }

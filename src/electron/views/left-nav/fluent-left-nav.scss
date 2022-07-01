@@ -5,18 +5,22 @@
 
 .left-nav-panel-host {
     top: $default-title-height;
+
     .left-nav-panel {
         :global(.ms-Panel-main) {
-            width: calc(#{$detailsViewLeftNavWidth} + #{$detailsViewLeftNavBorderWidth});
+            width: calc(#{$details-view-left-nav-width} + #{$details-view-left-nav-border-width});
         }
+
         :global(.ms-Panel-content) {
-            padding: 0px;
+            padding: 0;
         }
     }
+
     .nav-menu-container {
         display: flex;
-        min-height: $detailsViewCommandBarHeight;
+        min-height: $details-view-command-bar-height;
         align-items: center;
+
         .nav-menu {
             color: $primary-text;
         }

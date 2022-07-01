@@ -4,12 +4,12 @@
 @import '../../common/styles/fonts.scss';
 
 .assessment-report-body-header {
-    margin: 0px 0px 21px 0px;
+    margin: 0 0 21px 0;
 
     h1 {
         font-size: 28px;
-        margin: 0px 0px 24px 0px;
-        font-weight: $fontWeightSemiBold;
+        margin: 0 0 24px 0;
+        font-weight: $font-weight-semi-bold;
         line-height: 40px;
         letter-spacing: -1;
     }
@@ -17,7 +17,7 @@
     p {
         font-size: 14px;
         color: $secondary-text;
-        font-family: $fontFamily;
+        font-family: $font-family;
         margin: 0;
         line-height: 20px;
     }

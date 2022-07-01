@@ -57,7 +57,6 @@ import { NavLinkRenderer } from 'DetailsView/components/left-nav/nav-link-render
 import { ipcRenderer, shell } from 'electron';
 import { DirectActionMessageDispatcher } from 'electron/adapters/direct-action-message-dispatcher';
 import { NullDetailsViewController } from 'electron/adapters/null-details-view-controller';
-import { NullStoreActionMessageCreator } from 'electron/adapters/null-store-action-message-creator';
 import { createGetToolDataDelegate } from 'electron/common/application-properties-provider';
 import { createContentPagesInfo } from 'electron/common/content-page-info-factory';
 import { createLeftNavItems } from 'electron/common/left-nav-item-factory';
@@ -123,7 +122,7 @@ import { getDefaultAddListenerForCollapsibleSection } from 'reports/components/r
 import { ReactStaticRenderer } from 'reports/react-static-renderer';
 import { ReportHtmlGenerator } from 'reports/report-html-generator';
 import { UserConfigurationActions } from '../../background/actions/user-configuration-actions';
-import { getPersistedData, PersistedData } from '../../background/get-persisted-data';
+import { getGlobalPersistedData, PersistedData } from '../../background/get-persisted-data';
 import { IndexedDBDataKeys } from '../../background/IndexedDBDataKeys';
 import { InstallationData } from '../../background/installation-data';
 import { UserConfigurationStore } from '../../background/stores/global/user-configuration-store';
@@ -137,7 +136,7 @@ import { TelemetryStateListener } from '../../background/telemetry/telemetry-sta
 import { initializeFabricIcons } from '../../common/fabric-icons';
 import { getIndexedDBStore } from '../../common/indexedDB/get-indexeddb-store';
 import { IndexedDBAPI, IndexedDBUtil } from '../../common/indexedDB/indexedDB';
-import { BaseClientStoresHub } from '../../common/stores/base-client-stores-hub';
+import { ClientStoresHub } from '../../common/stores/client-stores-hub';
 import { androidAppTitle } from '../../content/strings/application';
 import { ElectronAppDataAdapter } from '../adapters/electron-app-data-adapter';
 import { ElectronStorageAdapter } from '../adapters/electron-storage-adapter';
@@ -188,7 +187,7 @@ const indexedDBDataKeysToFetch = [
 
 const logger = createDefaultLogger();
 
-getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
+getGlobalPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
     ignorePersistedData: process.env.ACCESSIBILITY_INSIGHTS_ELECTRON_CLEAR_DATA === 'true', // this option is for tests to ensure they can use mock-adb
 })
     .then((persistedData: Partial<PersistedData>) => {
@@ -253,9 +252,11 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
         const unifiedScanResultStore = new UnifiedScanResultStore(
             unifiedScanResultActions,
             tabActions,
-            persistedData.unifiedScanResultStoreData,
+            null,
             indexedDBInstance,
             logger,
+            null,
+            false,
         );
         unifiedScanResultStore.initialize();
 
@@ -268,9 +269,12 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
         const cardSelectionStore = new CardSelectionStore(
             cardSelectionActions,
             unifiedScanResultActions,
-            persistedData.cardSelectionStoreData,
+            tabActions,
+            null,
             indexedDBInstance,
             logger,
+            null,
+            false,
         );
         cardSelectionStore.initialize();
 
@@ -278,9 +282,11 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
             contentActions,
             detailsViewActions,
             sidePanelActions,
-            persistedData.detailsViewStoreData,
+            null,
             indexedDBInstance,
             logger,
+            null,
+            false,
         );
         detailsViewStore.initialize();
 
@@ -301,7 +307,7 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
         const windowFrameUpdater = new WindowFrameUpdater(windowFrameActions, ipcRendererShim);
         windowFrameUpdater.initialize();
 
-        const storesHub = new BaseClientStoresHub<RootContainerState>([
+        const storesHub = new ClientStoresHub<RootContainerState>([
             userConfigurationStore,
             windowStateStore,
             scanStore,
@@ -579,7 +585,6 @@ getPersistedData(indexedDBInstance, indexedDBDataKeysToFetch, {
             getCardSelectionViewData: getCardSelectionViewData,
             screenshotViewModelProvider,
             ...testViewDeps,
-            storeActionMessageCreator: new NullStoreActionMessageCreator(),
             settingsProvider: UnifiedSettingsProvider,
             loadTheme,
             documentManipulator,

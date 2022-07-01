@@ -3,6 +3,8 @@
 import { NeedsReviewCardSelectionActionCreator } from 'background/actions/needs-review-card-selection-action-creator';
 import { NeedsReviewScanResultActionCreator } from 'background/actions/needs-review-scan-result-action-creator';
 import { TabStopRequirementActionCreator } from 'background/actions/tab-stop-requirement-action-creator';
+import { BrowserMessageBroadcasterFactory } from 'background/browser-message-broadcaster-factory';
+import { DevToolsMonitor } from 'background/dev-tools-monitor';
 import { PersistedData } from 'background/get-persisted-data';
 import { BrowserAdapter } from 'common/browser-adapters/browser-adapter';
 import { VisualizationConfigurationFactory } from 'common/configs/visualization-configuration-factory';
@@ -11,7 +13,6 @@ import { Logger } from 'common/logging/logger';
 import { NotificationCreator } from 'common/notification-creator';
 import { PromiseFactory } from 'common/promises/promise-factory';
 import { StateDispatcher } from 'common/state-dispatcher';
-import { WindowUtils } from 'common/window-utils';
 import { ActionCreator } from './actions/action-creator';
 import { ActionHub } from './actions/action-hub';
 import { CardSelectionActionCreator } from './actions/card-selection-action-creator';
@@ -42,19 +43,19 @@ export class TabContextFactory {
         private telemetryEventHandler: TelemetryEventHandler,
         private targetTabController: TargetTabController,
         private notificationCreator: NotificationCreator,
+        private detailsViewController: ExtensionDetailsViewController,
+        private browserAdapter: BrowserAdapter,
+        private readonly broadcasterFactory: BrowserMessageBroadcasterFactory,
         private readonly promiseFactory: PromiseFactory,
         private readonly logger: Logger,
         private readonly usageLogger: UsageLogger,
-        private readonly windowUtils: WindowUtils,
+        private readonly setTimeout: (handler: Function, timeout: number) => number,
         private readonly persistedData: PersistedData,
         private readonly indexedDBInstance: IndexedDBAPI,
+        private readonly persistStoreData: boolean,
     ) {}
 
-    public createTabContext(
-        broadcastMessage: (message) => Promise<void>,
-        browserAdapter: BrowserAdapter,
-        detailsViewController: ExtensionDetailsViewController,
-    ): TabContext {
+    public createTabContext(tabId: number): TabContext {
         const interpreter = new Interpreter();
         const actionsHub = new ActionHub();
         const storeHub = new TabContextStoreHub(
@@ -63,13 +64,15 @@ export class TabContextFactory {
             this.persistedData,
             this.indexedDBInstance,
             this.logger,
+            tabId,
+            this.persistStoreData,
         );
         const notificationCreator = new NotificationCreator(
-            browserAdapter,
+            this.browserAdapter,
             this.visualizationConfigurationFactory,
             this.logger,
         );
-        const shortcutsPageController = new ShortcutsPageController(browserAdapter);
+        const shortcutsPageController = new ShortcutsPageController(this.browserAdapter);
 
         const shortcutsPageActionCreator = new ShortcutsPageActionCreator(
             interpreter,
@@ -81,7 +84,7 @@ export class TabContextFactory {
         const actionCreator = new ActionCreator(
             interpreter,
             actionsHub,
-            detailsViewController,
+            this.detailsViewController,
             this.telemetryEventHandler,
             notificationCreator,
             this.visualizationConfigurationFactory,
@@ -93,7 +96,7 @@ export class TabContextFactory {
             interpreter,
             actionsHub.detailsViewActions,
             actionsHub.sidePanelActions,
-            detailsViewController,
+            this.detailsViewController,
             this.telemetryEventHandler,
         );
 
@@ -106,7 +109,7 @@ export class TabContextFactory {
         const tabActionCreator = new TabActionCreator(
             interpreter,
             actionsHub.tabActions,
-            browserAdapter,
+            this.browserAdapter,
             this.telemetryEventHandler,
             this.logger,
         );
@@ -125,7 +128,7 @@ export class TabContextFactory {
             interpreter,
             actionsHub.inspectActions,
             this.telemetryEventHandler,
-            browserAdapter,
+            this.browserAdapter,
             this.logger,
         );
         const pathSnippetActionCreator = new PathSnippetActionCreator(
@@ -148,7 +151,7 @@ export class TabContextFactory {
             interpreter,
             actionsHub.contentActions,
             this.telemetryEventHandler,
-            detailsViewController,
+            this.detailsViewController,
         );
         const cardSelectionActionCreator = new CardSelectionActionCreator(
             interpreter,
@@ -166,14 +169,16 @@ export class TabContextFactory {
         );
 
         const injectorController = new InjectorController(
-            new ContentScriptInjector(browserAdapter, this.promiseFactory, this.logger),
+            new ContentScriptInjector(this.browserAdapter, this.promiseFactory, this.logger),
             storeHub.visualizationStore,
             interpreter,
             storeHub.tabStore,
             storeHub.inspectStore,
-            this.windowUtils,
+            this.setTimeout,
             this.logger,
         );
+
+        const messageBroadcaster = this.broadcasterFactory.createTabSpecificBroadcaster(tabId);
 
         shortcutsPageActionCreator.registerCallbacks();
         actionCreator.registerCallbacks();
@@ -192,8 +197,17 @@ export class TabContextFactory {
         injectionActionCreator.registerCallbacks();
 
         injectorController.initialize();
-        const dispatcher = new StateDispatcher(broadcastMessage, storeHub, this.logger);
+        const dispatcher = new StateDispatcher(messageBroadcaster, storeHub, this.logger);
         dispatcher.initialize();
+
+        const devToolsMonitor = new DevToolsMonitor(
+            tabId,
+            this.browserAdapter,
+            this.promiseFactory,
+            interpreter,
+            actionsHub.devToolActions,
+        );
+        devToolsMonitor.initialize();
 
         return new TabContext(interpreter, storeHub);
     }

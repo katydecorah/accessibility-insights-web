@@ -28,6 +28,7 @@ import {
     AddResultDescriptionPayload,
     ExpandTestNavPayload,
     LoadAssessmentPayload,
+    OnDetailsViewInitializedPayload,
     SelectTestSubviewPayload,
 } from '../actions/action-payloads';
 import { AssessmentDataConverter } from '../assessment-data-converter';
@@ -64,6 +65,7 @@ export class AssessmentStore extends PersistentStore<AssessmentStoreData> {
             idbInstance,
             IndexedDBDataKeys.assessmentStore,
             logger,
+            true,
         );
     }
 
@@ -71,6 +73,10 @@ export class AssessmentStore extends PersistentStore<AssessmentStoreData> {
         persistedData: AssessmentStoreData,
     ): AssessmentStoreData {
         return this.initialAssessmentStoreDataGenerator.generateInitialState(persistedData);
+    }
+
+    public override getDefaultState(): AssessmentStoreData {
+        return this.generateDefaultState(this.persistedState);
     }
 
     protected addActionListeners(): void {
@@ -106,6 +112,7 @@ export class AssessmentStore extends PersistentStore<AssessmentStoreData> {
             this.onContinuePreviousAssessment,
         );
         this.assessmentActions.LoadAssessment.addListener(this.onLoadAssessment);
+        this.assessmentActions.updateDetailsViewId.addListener(this.onUpdateDetailsViewId);
     }
 
     private updateTargetTabWithId(tabId: number): void {
@@ -116,7 +123,7 @@ export class AssessmentStore extends PersistentStore<AssessmentStoreData> {
                     id: tab.id,
                     url: tab.url,
                     title: tab.title,
-                    appRefreshed: false,
+                    detailsViewId: this.state.persistedTabInfo?.detailsViewId,
                 };
 
                 this.emitChanged();
@@ -135,6 +142,11 @@ export class AssessmentStore extends PersistentStore<AssessmentStoreData> {
         this.state = this.initialAssessmentStoreDataGenerator.generateInitialState(
             payload.versionedAssessmentData.assessmentData,
         );
+        if (this.state.persistedTabInfo !== undefined) {
+            this.state.persistedTabInfo.detailsViewId = payload.detailsViewId;
+        } else {
+            this.state.persistedTabInfo = { detailsViewId: payload.detailsViewId };
+        }
         this.updateTargetTabWithId(payload.tabId);
     };
 
@@ -408,15 +420,28 @@ export class AssessmentStore extends PersistentStore<AssessmentStoreData> {
     private onResetData = (payload: ToggleActionPayload): void => {
         const test = this.assessmentsProvider.forType(payload.test);
         const config = test.getVisualizationConfiguration();
-        const defaultTestStatus: AssessmentData = config.getAssessmentData(this.getDefaultState());
+        const defaultTestStatus: AssessmentData = config.getAssessmentData(
+            this.generateDefaultState(null),
+        );
         this.state.assessments[test.key] = defaultTestStatus;
         this.state.assessmentNavState.selectedTestSubview = test.requirements[0].key;
         this.emitChanged();
     };
 
     private onResetAllAssessmentsData = (targetTabId: number): void => {
-        this.state = this.getDefaultState();
+        const detailsViewId = this.state.persistedTabInfo.detailsViewId;
+        this.state = this.generateDefaultState(null);
+        this.state.persistedTabInfo = { detailsViewId };
         this.updateTargetTabWithId(targetTabId);
+    };
+
+    private onUpdateDetailsViewId = (payload: OnDetailsViewInitializedPayload): void => {
+        if (!this.state.persistedTabInfo) {
+            this.state.persistedTabInfo = { detailsViewId: payload.detailsViewId };
+        } else {
+            this.state.persistedTabInfo.detailsViewId = payload.detailsViewId;
+        }
+        this.emitChanged();
     };
 
     private getDefaultTestStepForTest(testType: VisualizationType): string {

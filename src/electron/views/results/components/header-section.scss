@@ -9,6 +9,7 @@
 
     .title {
         @include text-style-title-m;
+
         line-height: 25px;
         color: $primary-text;
         margin-top: 0;
@@ -16,7 +17,7 @@
     }
 
     .subtitle {
-        font-size: $fontSizeM;
+        font-size: $font-size-m;
         line-height: 16px;
         color: $secondary-text;
         margin-bottom: 0;
