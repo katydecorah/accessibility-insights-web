@@ -70,6 +70,7 @@ export const AzureBoardsSettingsForm = NamedFC<SettingsFormProps<AzureBoardsIssu
                     options={options}
                     placeholder="Select an option"
                     label="Select a field for issue details"
+                    ariaLabel="Select a field for issue details" // set aria-label to prevent screen readers from reading the placeholder "Select an option" twice
                     onChange={onIssueDetailLocationChange}
                     selectedKey={props.settings ? props.settings.issueDetailsField : null}
                 />
