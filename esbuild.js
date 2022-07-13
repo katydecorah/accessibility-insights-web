@@ -10,6 +10,7 @@ const { CreateStylePlugin } = require('./style-plugin');
 
 const src = './src';
 const argsObj = yargs(argv).argv;
+const metafile = argsObj.metafile === 'true' || false;
 
 const electronEntryFiles = {
     renderer: [path.resolve(__dirname, 'src/electron/views/renderer-initializer.ts')],
@@ -131,6 +132,7 @@ const config = {
     sourcemap: sourcemap,
     target,
     outdir: outdir,
+    metafile,
     outExtension: {
         '.js': '.bundle.js',
     },
@@ -139,7 +141,20 @@ const config = {
     define,
 };
 
-esbuild.build(config).catch(e => {
-    console.error(e);
-    process.exit(1);
-});
+esbuild
+    .build(config)
+    .then(result => {
+        // Write meta files when `metafile` is enabled
+        // example: node esbuild.js --env prod --metafile true
+        if (result && result.metafile) {
+            console.log('Wrote meta for ', argsObj.env || 'extension');
+            require('fs').writeFileSync(
+                `./tools/meta-${argsObj.env || 'extension'}.json`,
+                JSON.stringify(result.metafile.inputs, null, 2),
+            );
+        }
+    })
+    .catch(e => {
+        console.error(e);
+        process.exit(1);
+    });

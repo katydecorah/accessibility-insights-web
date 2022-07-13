@@ -21,6 +21,8 @@ analysis/
 *.scss.d.ts
 original-manifest-copy.json
 
+tools/meta-*
+
 # Dependency directories
 node_modules/
 .DS_STORE

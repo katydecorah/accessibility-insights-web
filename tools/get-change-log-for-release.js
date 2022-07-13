@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const commander = require('commander');
 const simpleGit = require('simple-git');
+const esbuildFileDirectory = require('./esbuild-file-directory.js');
 const fileDirectory = require('./file-directory.js');
 
 const main = async () => {
@@ -86,7 +87,8 @@ const assignProductToFile = (files, directory) => {
 };
 
 const generateOutputContent = async (gitLogs, version) => {
-    const directory = await fileDirectory();
+    const webpackDirectory = await fileDirectory();
+    const directory = await esbuildFileDirectory(webpackDirectory);
 
     const objLogs = await Promise.all(
         gitLogs.all.map(async log => {
