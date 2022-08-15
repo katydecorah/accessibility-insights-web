@@ -188,6 +188,11 @@ exports[`DetailsViewContent render renders normally 1`] = `
     }
     visualizationScanResultData={
       Object {
+        "accessibleNames": Object {
+          "fullAxeResultsMap": null,
+          "fullIdToRuleResultMap": null,
+          "scanResult": null,
+        },
         "color": Object {
           "fullAxeResultsMap": null,
           "fullIdToRuleResultMap": null,
@@ -258,6 +263,9 @@ exports[`DetailsViewContent render renders normally 1`] = `
         "selectedFastPassDetailsView": 1,
         "tests": Object {
           "adhoc": Object {
+            "accessibleNames": Object {
+              "enabled": false,
+            },
             "color": Object {
               "enabled": false,
             },
