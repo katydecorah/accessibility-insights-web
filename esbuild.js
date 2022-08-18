@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
+const { writeFileSync } = require('fs');
 const path = require('path');
 const { argv } = require('process');
 const NodeResolve = require('@esbuild-plugins/node-resolve');
@@ -141,19 +141,21 @@ const config = {
     define,
 };
 
+function esbuildMetadata(result) {
+    // Write meta files when `metafile` is enabled
+    // example: node esbuild.js --env prod --metafile true
+    if (result && result.metafile) {
+        console.log('Wrote meta for ', argsObj.env || 'extension');
+        writeFileSync(
+            `./tools/meta-${argsObj.env || 'extension'}.json`,
+            JSON.stringify(result.metafile.inputs, null, 2),
+        );
+    }
+}
+
 esbuild
     .build(config)
-    .then(result => {
-        // Write meta files when `metafile` is enabled
-        // example: node esbuild.js --env prod --metafile true
-        if (result && result.metafile) {
-            console.log('Wrote meta for ', argsObj.env || 'extension');
-            require('fs').writeFileSync(
-                `./tools/meta-${argsObj.env || 'extension'}.json`,
-                JSON.stringify(result.metafile.inputs, null, 2),
-            );
-        }
-    })
+    .then(esbuildMetadata)
     .catch(e => {
         console.error(e);
         process.exit(1);

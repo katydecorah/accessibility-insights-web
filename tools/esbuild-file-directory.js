@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
+const { writeFileSync } = require('fs');
 const { execFileSync } = require('node:child_process');
 const metaDevMv3 = require('./meta-dev-mv3.json');
 const metaExtension = require('./meta-extension.json');
@@ -56,7 +55,7 @@ function esbuildFileDirectory(directory = {}) {
         }
     }
 
-    require('fs').writeFileSync('./tools/directory.json', JSON.stringify(directory, null, 2));
+    writeFileSync('./tools/directory.json', JSON.stringify(directory, null, 2));
     return new Promise(resolve => {
         resolve(directory);
     });
