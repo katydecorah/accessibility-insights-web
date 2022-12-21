@@ -1,0 +1,58 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+name: Update browserslist database
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 13 1 * *' # Scheduled to run on the 1st of each month
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-browserslist-database:
+    env:
+      BRANCH_NAME: update-browserslist-database
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+            
+      - name: Create branch
+        run: git checkout -b $BRANCH_NAME
+      
+      - name: Check for browserslist changes
+        id: changes
+        run: |
+          if $(npx update-browserslist-db@latest | grep -q 'Installing new caniuse-lite version'); then
+            echo "CHANGES=true" >> $GITHUB_OUTPUT
+            echo "::notice::Found changes to browserslists"
+          else
+            echo "CHANGES=false" >> $GITHUB_OUTPUT
+            echo "::notice::No changes to browserslists"
+          fi
+      
+      - name: If there are changes, commit yarn.lock and create pull request
+        if: steps.changes.outputs.CHANGES == 'true'
+        run: |
+          LIST=$(npx browserslist)
+
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add yarn.lock && git commit -m "Update browserslists" -m "This pull request was created by the browserslist.yml workflow. It is scheduled each month to check for [browserslists](https://github.com/browserslist/browserslist) updates and then commit changes to yarn.lock. 
+          
+          As a reviewer, you may need to update the snapshots tests as changes to browerslists can result in [autoprefixer](https://github.com/postcss/autoprefixer) adding or removing CSS prefixes.
+          
+          Updated list of browser:
+          $LIST
+          "
+          git push --set-upstream origin $BRANCH_NAME
+
+          gh pr create -B main -H $BRANCH_NAME -f
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+      
+      
