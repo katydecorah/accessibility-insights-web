@@ -23,15 +23,19 @@ jobs:
       - name: Create branch
         run: git checkout -b $BRANCH_NAME
       
-      - name: Check for browserslist changes
+      - name: Update browserslist
+        run: npx update-browserslist-db@latest
+      
+      - name: Check for changes to yarn.lock
         id: changes
         run: |
-          if $(npx update-browserslist-db@latest | grep -q 'Installing new caniuse-lite version'); then
-            echo "CHANGES=true" >> $GITHUB_OUTPUT
-            echo "::notice::Found changes to browserslists"
-          else
+          if [[ -z "$(git status --porcelain yarn.lock)" ]];
+          then
             echo "CHANGES=false" >> $GITHUB_OUTPUT
             echo "::notice::No changes to browserslists"
+          else
+            echo "CHANGES=true" >> $GITHUB_OUTPUT
+            echo "::notice::Found changes to browserslists"
           fi
       
       - name: If there are changes, commit yarn.lock and create pull request
